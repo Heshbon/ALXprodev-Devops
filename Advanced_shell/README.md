@@ -71,3 +71,9 @@ Contributions are welcome! Please ensure all pull requests:
 - Pass all test cases.
 - Include proper error handling.
 - Follow existing coding standards.
+
+## 📚 API License & Credits
+
+This project uses data from the [PokéAPI](https://pokeapi.co), which is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+© PokéAPI contributors. Pokémon and Pokémon character names are trademarks of Nintendo.
