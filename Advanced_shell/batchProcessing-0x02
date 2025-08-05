@@ -1,6 +1,6 @@
 #!/bin/bash
 
-POKEMON_LIST=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+POKEMON_LIST=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 DELAY=2  # seconds between requests
 API_BASE="https://pokeapi.co/api/v2/pokemon/"
 
