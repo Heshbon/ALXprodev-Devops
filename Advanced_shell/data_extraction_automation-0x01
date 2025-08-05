@@ -23,4 +23,4 @@ HEIGHT_M=$(awk "BEGIN { printf \"%.1f\", $HEIGHT / 10 }")
 WEIGHT_KG=$(awk "BEGIN { printf \"%.0f\", $WEIGHT / 10 }")
 
 # The output
-echo "${NAME} is of type ${TYPE}, weighs ${WEIGHT_KG}kg, and is ${HEIGHT_M}m tall."
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
