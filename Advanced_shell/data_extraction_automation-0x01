@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Argument count check
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <pokemon_json_file>"
+    exit 1
+fi
+data_extraction_automation-0x01
+# File exist check
+if [ ! -f "$1" ]; then
+    echo "Error: File '$1' not found"
+    exit 1
+fi
+
+# Data extract using jq
+NAME=$(jq -r '.name' "$1" | sed 's/.*/\u&/')
+HEIGHT=$(jq -r '.height' "$1")
+WEIGHT=$(jq -r '.weight' "$1")
+TYPE=$(jq -r '.types[0].type.name' "$1" | sed 's/.*/\u&/')
+
+# Units conversion
+HEIGHT_M=$(awk "BEGIN { printf \"%.1f\", $HEIGHT / 10 }")
+WEIGHT_KG=$(awk "BEGIN { printf \"%.0f\", $WEIGHT / 10 }")
+
+# The output
+echo "${NAME} is of type ${TYPE}, weighs ${WEIGHT_KG}kg, and is ${HEIGHT_M}m tall."
