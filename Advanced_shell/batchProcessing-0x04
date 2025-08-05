@@ -4,7 +4,6 @@ POKEMON_LIST=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 API_BASE="https://pokeapi.co/api/v2/pokemon/"
 DATA_DIR="pokemon_data"
 ERROR_LOG="pokemon_errors.log"
-TIMEOUT=8
 
 # Output directory
 mkdir -p "$DATA_DIR"
@@ -16,35 +15,32 @@ fetch_pokemon() {
     local url="${API_BASE}${pokemon}"
     local output_file="${DATA_DIR}/${pokemon}.json"
 
-    curl -s -f "$url" -o "$output_file" && echo "Saved data for ${pokemon}" || {
+    echo "Fetching data for ${pokemon}..."
+
+    if curl -s -f "$url" -o "$output_file"; then
+        echo "Saved data to ${output_file}"
+        return 0
+    else
         echo "Failed to fetch ${pokemon}"
         echo "$(date): Failed to fetch ${pokemon}" >> "$ERROR_LOG"
-    }
+        return 1
+    fi
 }
 
-# Background processes
-declare -A pid_map
+# Parallel background jobs
+export -f fetch_pokemon
+export API_BASE DATA_DIR ERROR_LOG
 
+# Fetch operations in parallel
+pids=()
 for pokemon in "${POKEMON_LIST[@]}"; do
     fetch_pokemon "$pokemon" &
-    pid_map[$!]=$pokemon
+    pids+=($!)
 done
 
-# Kill timeout
-for pid in "${!pid_map[@]}"; do
-    timeout=$TIMEOUT
-    while kill -0 "$pid" 2>/dev/null && [ $timeout -gt 0 ]; do
-        sleep 1
-        ((timeout--))
-    done
-
-    if kill -0 "$pid" 2>/dev/null; then
-        echo "Killing delayed fetch for ${pid_map[$pid]}"
-        kill "$pid"
-        echo "$(date): Killed delayed fetch for ${pid_map[$pid]}" >> "$ERROR_LOG"
-    else
-        wait "$pid"
-    fi
+# Background processes
+for pid in "${pids[@]}"; do
+    wait "$pid"
 done
 
 # Error log
