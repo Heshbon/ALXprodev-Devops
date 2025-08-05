@@ -3,24 +3,37 @@
 POKEMON_LIST=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 DELAY=2
 API_BASE="https://pokeapi.co/api/v2/pokemon/"
+MAX_RETRIES=3
+ERROR_LOG="pokemon_errors.log"
 
 # Output directory
 mkdir -p pokemon_data
+: > "$ERROR_LOG" # Clears log at teh start
 
 # Fetch and save Pokémon data
 fetch_pokemon() {
     local pokemon=$1
     local url="${API_BASE}${pokemon,,}"
     local output_file="pokemon_data/${pokemon,,}.json"
+    local attempt=1
 
     echo "Fetching data for ${pokemon}..."
 
-    if curl -s -f "$url" -o "$output_file"; then
-        echo "Saved data to ${output_file} ✅"
-    else
-        echo "Failed to fetch ${pokemon} ❌"
-        return 1
-    fi
+    while [ $attempt -le $MAX_RETRIES ]; do
+        if curl -s -f "$url" -o "$output_file"; then
+            echo "Saved data to ${output_file} ✅"
+            return 0
+            
+        else
+            echo "Attempt $attempt failed for ${pokemon}"
+            ((attempt++))
+            sleep "$DELAY"
+        fi
+   done
+   
+   echo "Failed to fetch ${pokemon} after $MAX_RETRIES attempts ❌"
+   echo "$(date): Failed to fetch ${pokemon}" >> "$ERROR_LOG"
+   return 1
 }
 
 # Main execution
@@ -28,3 +41,9 @@ for pokemon in "${POKEMON_LIST[@]}"; do
     fetch_pokemon "$pokemon"
     sleep "$DELAY"
 done
+
+# Print error summary
+if [ -s "$ERROR_LOG" ]; then
+    echo -e "\n⚠️  Error Summary:"
+    cat "$ERROR_LOG"
+fi
