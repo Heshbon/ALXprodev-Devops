@@ -21,7 +21,7 @@ fetch_pokemon() {
 
     while [ $attempt -le $MAX_RETRIES ]; do
         if curl -s -f "$url" -o "$output_file"; then
-            echo "Saved data to ${output_file} ✅"
+            echo "Saved data to ${output_file}"
             return 0
             
         else
@@ -31,7 +31,7 @@ fetch_pokemon() {
         fi
    done
    
-   echo "Failed to fetch ${pokemon} after $MAX_RETRIES attempts ❌"
+   echo "Failed to fetch ${pokemon} after $MAX_RETRIES attempts"
    echo "$(date): Failed to fetch ${pokemon}" >> "$ERROR_LOG"
    return 1
 }
@@ -44,6 +44,6 @@ done
 
 # Print error summary
 if [ -s "$ERROR_LOG" ]; then
-    echo -e "\n⚠️  Error Summary:"
+    echo -e "\nError Summary:"
     cat "$ERROR_LOG"
 fi
