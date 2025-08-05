@@ -43,6 +43,8 @@ for pid in "${pids[@]}"; do
     wait "$pid"
 done
 
+kill -0 $$ 2>/dev/null
+
 # Error log
 if [ -s "$ERROR_LOG" ]; then
     echo -e "\nError Summary:"
